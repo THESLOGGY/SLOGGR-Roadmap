@@ -147,6 +147,48 @@
       border-radius: 16px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.08);
+      transition: border-color 0.3s ease;
+    }
+
+    li.task.partial {
+      border-color: rgba(234, 179, 8, 0.4);
+    }
+
+    li.task.full {
+      border-color: rgba(34, 197, 94, 0.4);
+    }
+
+    .mini-progress-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mini-progress {
+      flex: 1;
+      height: 4px;
+      background: rgba(148, 163, 184, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .mini-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      width: 0%;
+      transition: width 0.25s ease, background 0.25s ease;
+    }
+
+    .mini-progress.partial .mini-progress-bar {
+      background: linear-gradient(90deg, #f59e0b, #eab308);
+    }
+
+    .mini-progress-text {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      min-width: 30px;
+      text-align: right;
     }
 
     label.task-label {
@@ -173,11 +215,16 @@
       height: 18px;
       accent-color: #7dd3fc;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     input[type='checkbox']:disabled {
       cursor: not-allowed;
       opacity: 0.5;
+    }
+
+    input[type='checkbox']:indeterminate {
+      accent-color: #eab308;
     }
 
     .children {
@@ -519,6 +566,8 @@
       }
 
       updateAllParents();
+      updateTaskColors();
+      updateMiniProgress();
       updateProgress();
     }
 
@@ -529,15 +578,79 @@
       const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
       progressBar.style.width = `${percent}%`;
       progressText.textContent = `${completed} of ${total} tasks complete (${percent}%)`;
+      updateTaskColors();
+      updateMiniProgress();
     }
 
     function setEditMode(enabled) {
       isEditMode = enabled;
       checkboxes.forEach(box => {
-        box.disabled = !enabled;
+        const isParent = parentMap.has(box.dataset.id);
+        box.disabled = !enabled || isParent;
       });
-      authStatus.textContent = enabled ? '✏️ Edit Mode ON' : '🔒 View Only Mode';
-      authStatus.style.color = enabled ? '#22c55e' : '#94a3b8';
+    }
+
+    function updateTaskColors() {
+      checkboxes.forEach(box => {
+        const taskContainer = box.closest('li.task');
+        if (!taskContainer) return;
+        
+        const children = parentMap.get(box.dataset.id) || [];
+        if (children.length === 0) return;
+        
+        const checkedCount = children.filter(c => c.checked).length;
+        const total = children.length;
+        
+        taskContainer.classList.remove('partial', 'full');
+        
+        if (checkedCount === total) {
+          taskContainer.classList.add('full');
+        } else if (checkedCount > 0) {
+          taskContainer.classList.add('partial');
+        }
+      });
+    }
+
+    function updateMiniProgress() {
+      checkboxes.forEach(box => {
+        const taskContainer = box.closest('li.task');
+        if (!taskContainer) return;
+        
+        const children = parentMap.get(box.dataset.id) || [];
+        if (children.length === 0) return;
+        
+        let progressContainer = taskContainer.querySelector('.mini-progress-container');
+        if (!progressContainer) {
+          progressContainer = document.createElement('div');
+          progressContainer.className = 'mini-progress-container';
+          taskContainer.appendChild(progressContainer);
+        }
+        
+        const checkedCount = children.filter(c => c.checked).length;
+        const total = children.length;
+        const percent = Math.round((checkedCount / total) * 100);
+        
+        let miniProgress = progressContainer.querySelector('.mini-progress');
+        if (!miniProgress) {
+          miniProgress = document.createElement('div');
+          miniProgress.className = 'mini-progress';
+          const bar = document.createElement('div');
+          bar.className = 'mini-progress-bar';
+          miniProgress.appendChild(bar);
+          progressContainer.appendChild(miniProgress);
+        }
+        
+        miniProgress.classList.toggle('partial', checkedCount > 0 && checkedCount < total);
+        miniProgress.querySelector('.mini-progress-bar').style.width = `${percent}%`;
+        
+        let textSpan = progressContainer.querySelector('.mini-progress-text');
+        if (!textSpan) {
+          textSpan = document.createElement('span');
+          textSpan.className = 'mini-progress-text';
+          progressContainer.appendChild(textSpan);
+        }
+        textSpan.textContent = `${checkedCount}/${total}`;
+      });
     }
 
     function updateAuthUI(user) {
@@ -558,7 +671,7 @@
 
     checkboxes.forEach(box => {
       box.addEventListener('change', () => {
-        if (!isEditMode) {
+        if (!isEditMode || box.disabled) {
           box.checked = !box.checked;
           return;
         }
@@ -575,15 +688,17 @@
         if (isEditMode) {
           saveState();
         }
+        updateMiniProgress();
       });
     });
 
     auth.onAuthStateChanged(user => {
-      updateAuthUI(user);
       if (user && user.email === allowedEditorEmail) {
         setEditMode(true);
+        updateProgress();
       } else {
         setEditMode(false);
+        updateProgress();
       }
     });
 
@@ -592,16 +707,18 @@
       loadState(data);
       if (!isInitialized) {
         isInitialized = true;
+        updateMiniProgress();
       }
     }, err => {
       console.error('Firebase error:', err);
-      alert('Error connecting to Firebase. View data may be unavailable.');
       if (!isInitialized) {
         isInitialized = true;
+        updateMiniProgress();
       }
     });
 
     setEditMode(false);
+    updateProgress();
   </script>
 </body>
 </html>
