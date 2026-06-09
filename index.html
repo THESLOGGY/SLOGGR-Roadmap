@@ -505,9 +505,15 @@
     const progressBar = document.getElementById('overall-progress');
 
     detailsNodes.forEach(detail => {
-      const hasChildTask = detail.querySelector('ul.task-list li');
-      if (!hasChildTask) {
+      const key = detail.dataset.key;
+      // consider a detail to have children if any checkbox lists it as parent
+      // or if there are direct <li> tasks inside its .task-list
+      const hasChildCheckbox = !!document.querySelector(`input[data-parent="${key}"]`);
+      const hasLi = !!detail.querySelector('ul.task-list li');
+      if (!hasChildCheckbox && !hasLi) {
         detail.classList.add('no-children');
+      } else {
+        detail.classList.remove('no-children');
       }
     });
     const progressText = document.getElementById('progress-text');
