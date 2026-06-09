@@ -226,7 +226,27 @@
 
     input[type='checkbox']:disabled {
       cursor: not-allowed;
-      opacity: 0.5;
+      opacity: 1;
+      filter: none;
+    }
+
+    input[type='checkbox']:disabled:checked {
+      accent-color: #3b82f6;
+    }
+
+    input[type='checkbox']:disabled:indeterminate {
+      accent-color: #eab308;
+    }
+
+    details.no-children summary::before {
+      content: '';
+      width: 0;
+      opacity: 0;
+    }
+
+    details.no-children summary {
+      cursor: default;
+      pointer-events: none;
     }
 
     .children {
@@ -431,7 +451,7 @@
       <details open data-key="section-derts">
         <summary>
           <span>DERTS PvP Ranks</span>
-          <span class="section-meta">1 task</span>
+          <span class="section-meta">2 tasks</span>
         </summary>
         <ul class="task-list">
           <li class="task">
@@ -441,12 +461,50 @@
                   <input type="checkbox" data-id="derts-website" disabled />
                   <span><strong>DERTS Website</strong></span>
                 </label>
+                <span class="section-meta">4 tasks</span>
               </summary>
               <div class="children">
-                <ul class="task-list"></ul>
+                <ul class="task-list">
+                  <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-clip-uploads" data-parent="derts-website" /> Clip Uploads</label></li>
+                  <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-link-server" data-parent="derts-website" /> Link to DERTS+ Server</label></li>
+                  <li class="task">
+                    <details open data-key="derts-bug-fixes">
+                      <summary>
+                        <label class="task-label">
+                          <input type="checkbox" data-id="derts-bug-fixes" disabled />
+                          <span><strong>Bug Fixes</strong></span>
+                        </label>
+                      </summary>
+                      <div class="children">
+                        <ul class="task-list">
+                          <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-announcement-edits" data-parent="derts-bug-fixes" /> Updates on announcement message edits</label></li>
+                          <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-offline-video" data-parent="derts-bug-fixes" /> Offline video page fixed</label></li>
+                        </ul>
+                      </div>
+                    </details>
+                  </li>
+                  <li class="task">
+                    <details open data-key="derts-aesthetic-refresh">
+                      <summary>
+                        <label class="task-label">
+                          <input type="checkbox" data-id="derts-aesthetic-refresh" disabled />
+                          <span><strong>Aesthetic refresh</strong></span>
+                        </label>
+                      </summary>
+                      <div class="children">
+                        <ul class="task-list">
+                          <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-bg-text-header" data-parent="derts-aesthetic-refresh" /> background, text, element, and header overhaul</label></li>
+                          <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-enhanced-uis" data-parent="derts-aesthetic-refresh" /> Enhanced UIs</label></li>
+                          <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-sound-fx" data-parent="derts-aesthetic-refresh" /> Better sound fx</label></li>
+                        </ul>
+                      </div>
+                    </details>
+                  </li>
+                </ul>
               </div>
             </details>
           </li>
+          <li class="task"><label class="task-label"><input type="checkbox" data-id="derts-host-event" /> Host 1st event</label></li>
         </ul>
       </details>
     </div>
@@ -473,6 +531,13 @@
     const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-id]'));
     const detailsNodes = Array.from(document.querySelectorAll('details[data-key]'));
     const progressBar = document.getElementById('overall-progress');
+
+    detailsNodes.forEach(detail => {
+      const hasChildTask = detail.querySelector('ul.task-list li');
+      if (!hasChildTask) {
+        detail.classList.add('no-children');
+      }
+    });
     const progressText = document.getElementById('progress-text');
     const authStatus = document.getElementById('auth-status');
 
