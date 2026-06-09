@@ -249,6 +249,31 @@
       pointer-events: none;
     }
 
+    details.top-level summary::before {
+      content: '';
+      width: 0;
+      opacity: 0;
+    }
+
+    details.top-level summary {
+      cursor: default;
+      pointer-events: none;
+    }
+    details.top-level summary::before {
+      content: '';
+      width: 0;
+      opacity: 0;
+    }
+
+    details.top-level summary {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    details.top-level summary span:first-child {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
     .children {
       margin: 0;
       padding-left: 24px;
@@ -286,7 +311,7 @@
     <div class="section-meta" id="progress-text">0 of 0 tasks complete</div>
 
     <div class="main-grid">
-      <details open data-key="section-boundless">
+      <details open class="top-level" data-key="section-boundless">
         <summary>
           <span>Boundless SMP Arc 1</span>
           <span class="section-meta">3 tasks</span>
@@ -352,7 +377,7 @@
         </ul>
       </details>
 
-      <details open data-key="section-videos">
+      <details open class="top-level" data-key="section-videos">
         <summary>
           <span>My Videos</span>
           <span class="section-meta">2 tasks</span>
@@ -384,62 +409,10 @@
               </summary>
               <div class="children">
                 <ul class="task-list">
-                  <li class="task">
-                    <details open data-key="how-greed-kills">
-                      <summary>
-                        <label class="task-label">
-                          <input type="checkbox" data-id="how-greed-kills" disabled />
-                          <span><strong>How Greed Kills</strong></span>
-                        </label>
-                      </summary>
-                      <div class="children">
-                        <ul class="task-list">
-                        </ul>
-                      </div>
-                    </details>
-                  </li>
-                  <li class="task">
-                    <details open data-key="the-mask">
-                      <summary>
-                        <label class="task-label">
-                          <input type="checkbox" data-id="the-mask" disabled />
-                          <span><strong>The Mask</strong></span>
-                        </label>
-                      </summary>
-                      <div class="children">
-                        <ul class="task-list">
-                        </ul>
-                      </div>
-                    </details>
-                  </li>
-                  <li class="task">
-                    <details open data-key="fortunae-teaser">
-                      <summary>
-                        <label class="task-label">
-                          <input type="checkbox" data-id="fortunae-teaser" disabled />
-                          <span><strong>Fortunae Season 3 teaser + A Name lost to time</strong></span>
-                        </label>
-                      </summary>
-                      <div class="children">
-                        <ul class="task-list">
-                        </ul>
-                      </div>
-                    </details>
-                  </li>
-                  <li class="task">
-                    <details open data-key="ruin-peace">
-                      <summary>
-                        <label class="task-label">
-                          <input type="checkbox" data-id="ruin-peace" disabled />
-                          <span><strong>How To Ruin Peace</strong></span>
-                        </label>
-                      </summary>
-                      <div class="children">
-                        <ul class="task-list">
-                        </ul>
-                      </div>
-                    </details>
-                  </li>
+                  <li class="task"><label class="task-label"><input type="checkbox" data-id="how-greed-kills" data-parent="story-sloggr" /> How Greed Kills</label></li>
+                  <li class="task"><label class="task-label"><input type="checkbox" data-id="the-mask" data-parent="story-sloggr" /> The Mask</label></li>
+                  <li class="task"><label class="task-label"><input type="checkbox" data-id="fortunae-teaser" data-parent="story-sloggr" /> Fortunae Season 3 teaser + A Name lost to time</label></li>
+                  <li class="task"><label class="task-label"><input type="checkbox" data-id="ruin-peace" data-parent="story-sloggr" /> How To Ruin Peace</label></li>
                   <li class="task"><label class="task-label"><input type="checkbox" data-id="extra-clips" data-parent="story-sloggr" /> Extra clips edited to be in description</label></li>
                 </ul>
               </div>
@@ -448,7 +421,7 @@
         </ul>
       </details>
 
-      <details open data-key="section-derts">
+      <details open class="top-level" data-key="section-derts">
         <summary>
           <span>DERTS PvP Ranks</span>
           <span class="section-meta">2 tasks</span>
@@ -461,7 +434,6 @@
                   <input type="checkbox" data-id="derts-website" disabled />
                   <span><strong>DERTS Website</strong></span>
                 </label>
-                <span class="section-meta">4 tasks</span>
               </summary>
               <div class="children">
                 <ul class="task-list">
