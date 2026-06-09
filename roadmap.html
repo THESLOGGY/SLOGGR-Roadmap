@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Roadmap</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      color: #e6e6e6;
+      background: #0f1720;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, rgba(94, 114, 228, 0.2), transparent 35%),
+                  radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 30%),
+                  #0f1720;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 30px;
+      background: rgba(15, 23, 32, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.23);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: clamp(2rem, 3vw, 3rem);
+      letter-spacing: -0.04em;
+    }
+
+    p.description {
+      margin: 12px 0 24px;
+      color: #a1a1aa;
+      line-height: 1.75;
+    }
+
+    details {
+      margin: 12px 0;
+      padding: 12px 18px;
+      border-radius: 18px;
+      background: rgba(148, 163, 184, 0.08);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 700;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::before {
+      content: '▾';
+      display: inline-block;
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+      width: 1em;
+      text-align: center;
+      color: #7dd3fc;
+    }
+
+    details[open] summary::before {
+      transform: rotate(180deg);
+    }
+
+    .section-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    ul.task-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 14px 0 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    li.task {
+      display: grid;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    label.task-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    input[type='checkbox'] {
+      width: 18px;
+      height: 18px;
+      accent-color: #7dd3fc;
+      cursor: pointer;
+    }
+
+    .children {
+      margin: 0;
+      padding-left: 24px;
+      border-left: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .children li.task {
+      padding: 10px 12px;
+      background: rgba(15, 23, 32, 0.82);
+    }
+
+    .progress {
+      margin-top: 8px;
+      height: 10px;
+      background: rgba(148, 163, 184, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.18);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .note {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Personal Roadmap</h1>
+    <p class="description">This page is a local interactive roadmap. Expand sections, tick subtasks, and watch progress update. Your state is saved automatically in this browser.</p>
+
+    <div class="footer">
+      <div>
+        <div class="note">Shared roadmap synced in real-time with Firebase</div>
+        <div id="edit-status" style="margin-top: 8px; font-weight: 600;">🔒 View Only Mode</div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="button" id="unlock-button">🔓 Unlock Edit Mode</button>
+        <button class="button" id="clear-progress">Clear progress</button>
+      </div>
+    </div>
+
+    <div class="progress" aria-label="Overall progress">
+      <div class="progress-bar" id="overall-progress"></div>
+    </div>
+    <div class="section-meta" id="progress-text">0 of 0 tasks complete</div>
+
+    <details open data-key="section-boundless">
+      <summary>
+        <span>Boundless SMP Arc 1</span>
+        <span class="section-meta">5 tasks</span>
+      </summary>
+      <ul class="task-list">
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="sloggr-episodes" disabled />
+            <span><strong>SLOGGR's episodes</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="sloggr-ep1" data-parent="sloggr-episodes" /> Ep 1</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="sloggr-ep2" data-parent="sloggr-episodes" /> Ep 2</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="sloggr-ep3" data-parent="sloggr-episodes" /> Ep 3</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="sloggr-ep4" data-parent="sloggr-episodes" /> Ep 4</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="sloggr-ep5" data-parent="sloggr-episodes" /> Ep 5</label></li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="weirdfirestr-episodes" disabled />
+            <span><strong>Weirdfirestr's episodes</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="weird-ep1" data-parent="weirdfirestr-episodes" /> Ep 1</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="weird-ep2" data-parent="weirdfirestr-episodes" /> Ep 2</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="weird-ep3" data-parent="weirdfirestr-episodes" /> Ep 3</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="weird-ep4" data-parent="weirdfirestr-episodes" /> Ep 4</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="weird-ep5" data-parent="weirdfirestr-episodes" /> Ep 5</label></li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="glitchplayz-episodes" disabled />
+            <span><strong>GlitchTPlayz's episodes</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="glitch-ep1" data-parent="glitchplayz-episodes" /> Ep 1</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="glitch-ep2" data-parent="glitchplayz-episodes" /> Ep 2</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="glitch-ep3" data-parent="glitchplayz-episodes" /> Ep 3</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="glitch-ep4" data-parent="glitchplayz-episodes" /> Ep 4</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="glitch-ep5" data-parent="glitchplayz-episodes" /> Ep 5</label></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </details>
+
+    <details open data-key="section-videos">
+      <summary>
+        <span>My Videos</span>
+        <span class="section-meta">7 tasks</span>
+      </summary>
+      <ul class="task-list">
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="upload-montage" disabled />
+            <span><strong>Upload first montage</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="get-clips" data-parent="upload-montage" /> Get clips</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="edit-montage" data-parent="upload-montage" /> Edit</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task"><label class="task-label"><input type="checkbox" data-id="story-sloggr" /> The Story Of SLOGGR <span style="opacity:0.8; font-size:0.95rem;">(30/05/26)</span></label></li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="how-greed-kills" disabled />
+            <span><strong>How Greed Kills</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="how-greed-kills-edited" data-parent="how-greed-kills" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task"><label class="task-label"><input type="checkbox" data-id="extra-clips" /> Extra clips edited to be in description</label></li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="the-mask" disabled />
+            <span><strong>The Mask</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="the-mask-edited" data-parent="the-mask" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="fortunae-teaser" disabled />
+            <span><strong>Fortunae Season 3 teaser + A Name lost to time</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="fortunae-edited" data-parent="fortunae-teaser" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="ruin-peace" disabled />
+            <span><strong>How To Ruin Peace</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="ruin-peace-edited" data-parent="ruin-peace" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </details>
+
+    <details open data-key="section-derts">
+      <summary>
+        <span>DERTS PvP Ranks</span>
+        <span class="section-meta">6 tasks</span>
+      </summary>
+      <ul class="task-list">
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="derts-website" disabled />
+            <span><strong>DERTS Website</strong></span>
+            <span style="opacity:0.85; font-size:0.95rem;">(29/05/26)</span>
+          </label>
+          <div class="children">
+            <details open data-key="section-homepage">
+              <summary>
+                <span>Home page 🏠</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task">
+                  <label class="task-label">
+                    <input type="checkbox" data-id="homepage-functionality" disabled />
+                    <span><strong>Functionality</strong></span>
+                  </label>
+                  <div class="children">
+                    <ul class="task-list">
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="move-elements" data-parent="homepage-functionality" /> Able to move around elements customisably on page</label></li>
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="website-features" data-parent="homepage-functionality" /> Every website feature present on page</label></li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="task">
+                  <label class="task-label">
+                    <input type="checkbox" data-id="homepage-appearance" disabled />
+                    <span><strong>Appearance</strong></span>
+                  </label>
+                  <div class="children">
+                    <ul class="task-list">
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="background-tiles" data-parent="homepage-appearance" /> Background images on tiles</label></li>
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="refreshed-style" data-parent="homepage-appearance" /> Refreshed Style</label></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </details>
+
+            <details open data-key="section-ranks">
+              <summary>
+                <span>PvP Ranks page ⚔️</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-discord" data-parent="derts-website" /> Discord Button</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-3d" data-parent="derts-website" /> interactive 3d skins on profile banner</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-uptime" data-parent="derts-website" /> Constant uptime based on last snapshot</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-layout" data-parent="derts-website" /> Better layout</label></li>
+              </ul>
+            </details>
+
+            <details open data-key="section-events">
+              <summary>
+                <span>Events page 📯</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-expand" data-parent="derts-website" /> Expand/collapse events</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-live" data-parent="derts-website" /> Able to upload/detect live events</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-buttons" data-parent="derts-website" /> Better event tile buttons</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-title" data-parent="derts-website" /> Title fix</label></li>
+              </ul>
+            </details>
+
+            <details open data-key="section-videos-page">
+              <summary>
+                <span>Videos page 🎥</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-duplicate" data-parent="derts-website" /> Duplicate video bug fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-quota" data-parent="derts-website" /> Youtube api quota limit fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-title" data-parent="derts-website" /> Title fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-banner" data-parent="derts-website" /> Yt banner height fix</label></li>
+              </ul>
+            </details>
+
+            <details open data-key="section-community">
+              <summary>
+                <span>Community page 🫂</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-clips" data-parent="derts-website" /> Uploadable clips feature</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-discord" data-parent="derts-website" /> Discord Tiles</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-title" data-parent="derts-website" /> Title Fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-announcement" data-parent="derts-website" /> Correct announcement discord text formatting</label></li>
+              </ul>
+            </details>
+
+            <li class="task"><label class="task-label"><input type="checkbox" data-id="first-event" data-parent="derts-website" /> <strong>First Event</strong> <span style="opacity:0.8; font-size:0.95rem;">(5/06/26)</span></label></li>
+          </div>
+        </li>
+      </ul>
+    </details>
+  </main>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXnH9_fRHjT8xcvJJ1A1gbnruq7hwaV4g",
+      authDomain: "sloggr-s-roadmap.firebaseapp.com",
+      databaseURL: "https://sloggr-s-roadmap-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "sloggr-s-roadmap",
+      storageBucket: "sloggr-s-roadmap.firebasestorage.app",
+      messagingSenderId: "748744563518",
+      appId: "1:748744563518:web:6efcc4b1d5edee36976a6f",
+      measurementId: "G-LXKQPSHXNF"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][data-id]'));
+    const detailsNodes = Array.from(document.querySelectorAll('details[data-key]'));
+    const progressBar = document.getElementById('overall-progress');
+    const progressText = document.getElementById('progress-text');
+
+    let isEditMode = false;
+    let isInitialized = false;
+    const dbPath = 'roadmap-state';
+
+    function buildParentMap() {
+      const map = new Map();
+      checkboxes.forEach(box => {
+        const parentId = box.dataset.parent;
+        if (parentId) {
+          if (!map.has(parentId)) {
+            map.set(parentId, []);
+          }
+          map.get(parentId).push(box);
+        }
+      });
+      return map;
+    }
+
+    const parentMap = buildParentMap();
+
+    function updateParent(id) {
+      const parentBox = document.querySelector(`input[data-id="${id}"]`);
+      const children = parentMap.get(id) || [];
+      if (!parentBox || children.length === 0) return;
+
+      const allChecked = children.every(child => child.checked);
+      parentBox.checked = allChecked;
+      parentBox.indeterminate = !allChecked && children.some(child => child.checked);
+
+      const parentOfParent = parentBox.dataset.parent;
+      if (parentOfParent) {
+        updateParent(parentOfParent);
+      }
+    }
+
+    function updateAllParents() {
+      Array.from(parentMap.keys()).forEach(id => updateParent(id));
+    }
+
+    function saveState() {
+      if (!isEditMode || !isInitialized) return;
+
+      const saved = {
+        checkboxes: {},
+        details: {}
+      };
+
+      checkboxes.forEach(box => {
+        saved.checkboxes[box.dataset.id] = box.checked;
+      });
+
+      detailsNodes.forEach(detail => {
+        saved.details[detail.dataset.key] = detail.open;
+      });
+
+      db.ref(dbPath).set(saved).catch(err => {
+        console.error('Failed to save:', err);
+        alert('Error saving to Firebase. Check console.');
+      });
+
+      updateProgress();
+    }
+
+    function loadState(data) {
+      if (!data) {
+        updateAllParents();
+        updateProgress();
+        return;
+      }
+
+      if (data.checkboxes) {
+        checkboxes.forEach(box => {
+          if (data.checkboxes.hasOwnProperty(box.dataset.id)) {
+            box.checked = data.checkboxes[box.dataset.id];
+          }
+        });
+      }
+
+      if (data.details) {
+        detailsNodes.forEach(detail => {
+          const value = data.details[detail.dataset.key];
+          if (typeof value === 'boolean') {
+            detail.open = value;
+          }
+        });
+      }
+
+      updateAllParents();
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const relevantBoxes = checkboxes.filter(box => !box.disabled || box.dataset.parent);
+      const completed = relevantBoxes.filter(box => box.checked).length;
+      const total = relevantBoxes.length;
+      const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = `${completed} of ${total} tasks complete (${percent}%)`;
+    }
+
+    function setEditMode(enabled) {
+      isEditMode = enabled;
+      checkboxes.forEach(box => {
+        box.disabled = !enabled;
+      });
+      detailsNodes.forEach(detail => {
+        detail.style.pointerEvents = enabled ? 'auto' : 'auto';
+      });
+      document.getElementById('clear-progress').disabled = !enabled;
+      document.getElementById('edit-status').textContent = enabled ? '✏️ Edit Mode ON' : '🔒 View Only Mode';
+      document.getElementById('edit-status').style.color = enabled ? '#22c55e' : '#94a3b8';
+    }
+
+    function requestPassword() {
+      const pwd = prompt('Enter editor password to unlock edit mode:');
+      if (pwd === 'sloggr2026') {
+        setEditMode(true);
+        alert('Edit mode enabled!');
+      } else if (pwd !== null) {
+        alert('Incorrect password.');
+      }
+    }
+
+    document.getElementById('unlock-button').addEventListener('click', requestPassword);
+
+    checkboxes.forEach(box => {
+      box.addEventListener('change', () => {
+        if (!isEditMode) return;
+        const parentId = box.dataset.parent;
+        if (parentId) {
+          updateParent(parentId);
+        }
+        saveState();
+      });
+    });
+
+    detailsNodes.forEach(detail => {
+      detail.addEventListener('toggle', () => {
+        if (isEditMode) {
+          saveState();
+        }
+      });
+    });
+
+    document.getElementById('clear-progress').addEventListener('click', () => {
+      if (!confirm('Clear all progress?')) return;
+      db.ref(dbPath).set(null).then(() => {
+        window.location.reload();
+      });
+    });
+
+    // Load state from Firebase
+    db.ref(dbPath).on('value', (snapshot) => {
+      const data = snapshot.val();
+      loadState(data);
+      if (!isInitialized) {
+        isInitialized = true;
+        setEditMode(false);
+      }
+    }, (err) => {
+      console.error('Firebase error:', err);
+      alert('Error connecting to Firebase. View data may be unavailable.');
+      isInitialized = true;
+    });
+  </script>
+</body>
+</html>
