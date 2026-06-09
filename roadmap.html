@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SLOGGR's Roadmap</title>
+  <title>Personal Roadmap</title>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
   <style>
@@ -126,11 +126,6 @@
       cursor: pointer;
     }
 
-    input[type='checkbox']:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-
     .children {
       margin: 0;
       padding-left: 24px;
@@ -182,11 +177,6 @@
       transform: translateY(1px);
     }
 
-    .button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     .note {
       color: #cbd5e1;
       font-size: 0.95rem;
@@ -195,15 +185,18 @@
 </head>
 <body>
   <main class="page">
-    <h1>SLOGGR's Roadmap</h1>
-    <p class="description">This page is a shared interactive roadmap. Everyone can view progress in real-time. Only the editor can make changes.</p>
+    <h1>Personal Roadmap</h1>
+    <p class="description">This page is a local interactive roadmap. Expand sections, tick subtasks, and watch progress update. Your state is saved automatically in this browser.</p>
 
     <div class="footer">
       <div>
         <div class="note">Shared roadmap synced in real-time with Firebase</div>
         <div id="edit-status" style="margin-top: 8px; font-weight: 600;">🔒 View Only Mode</div>
       </div>
-      <button class="button" id="unlock-button">🔓 Unlock Edit Mode</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="button" id="unlock-button">🔓 Unlock Edit Mode</button>
+        <button class="button" id="clear-progress">Clear progress</button>
+      </div>
     </div>
 
     <div class="progress" aria-label="Overall progress">
@@ -214,7 +207,7 @@
     <details open data-key="section-boundless">
       <summary>
         <span>Boundless SMP Arc 1</span>
-        <span class="section-meta">3 tasks</span>
+        <span class="section-meta">5 tasks</span>
       </summary>
       <ul class="task-list">
         <li class="task">
@@ -270,7 +263,7 @@
     <details open data-key="section-videos">
       <summary>
         <span>My Videos</span>
-        <span class="section-meta">2 tasks</span>
+        <span class="section-meta">7 tasks</span>
       </summary>
       <ul class="task-list">
         <li class="task">
@@ -285,58 +278,49 @@
             </ul>
           </div>
         </li>
+        <li class="task"><label class="task-label"><input type="checkbox" data-id="story-sloggr" /> The Story Of SLOGGR <span style="opacity:0.8; font-size:0.95rem;">(30/05/26)</span></label></li>
         <li class="task">
           <label class="task-label">
-            <input type="checkbox" data-id="story-sloggr" disabled />
-            <span><strong>The Story Of SLOGGR</strong></span>
+            <input type="checkbox" data-id="how-greed-kills" disabled />
+            <span><strong>How Greed Kills</strong></span>
           </label>
           <div class="children">
             <ul class="task-list">
-              <li class="task">
-                <label class="task-label">
-                  <input type="checkbox" data-id="how-greed-kills" disabled />
-                  <span><strong>How Greed Kills</strong></span>
-                </label>
-                <div class="children">
-                  <ul class="task-list">
-                    <li class="task"><label class="task-label"><input type="checkbox" data-id="how-greed-kills-edited" data-parent="how-greed-kills" /> Edited in</label></li>
-                  </ul>
-                </div>
-              </li>
-              <li class="task">
-                <label class="task-label">
-                  <input type="checkbox" data-id="the-mask" disabled />
-                  <span><strong>The Mask</strong></span>
-                </label>
-                <div class="children">
-                  <ul class="task-list">
-                    <li class="task"><label class="task-label"><input type="checkbox" data-id="the-mask-edited" data-parent="the-mask" /> Edited in</label></li>
-                  </ul>
-                </div>
-              </li>
-              <li class="task">
-                <label class="task-label">
-                  <input type="checkbox" data-id="fortunae-teaser" disabled />
-                  <span><strong>Fortunae Season 3 teaser + A Name lost to time</strong></span>
-                </label>
-                <div class="children">
-                  <ul class="task-list">
-                    <li class="task"><label class="task-label"><input type="checkbox" data-id="fortunae-edited" data-parent="fortunae-teaser" /> Edited in</label></li>
-                  </ul>
-                </div>
-              </li>
-              <li class="task">
-                <label class="task-label">
-                  <input type="checkbox" data-id="ruin-peace" disabled />
-                  <span><strong>How To Ruin Peace</strong></span>
-                </label>
-                <div class="children">
-                  <ul class="task-list">
-                    <li class="task"><label class="task-label"><input type="checkbox" data-id="ruin-peace-edited" data-parent="ruin-peace" /> Edited in</label></li>
-                  </ul>
-                </div>
-              </li>
-              <li class="task"><label class="task-label"><input type="checkbox" data-id="extra-clips" data-parent="story-sloggr" /> Extra clips edited to be in description</label></li>
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="how-greed-kills-edited" data-parent="how-greed-kills" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task"><label class="task-label"><input type="checkbox" data-id="extra-clips" /> Extra clips edited to be in description</label></li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="the-mask" disabled />
+            <span><strong>The Mask</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="the-mask-edited" data-parent="the-mask" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="fortunae-teaser" disabled />
+            <span><strong>Fortunae Season 3 teaser + A Name lost to time</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="fortunae-edited" data-parent="fortunae-teaser" /> Edited in</label></li>
+            </ul>
+          </div>
+        </li>
+        <li class="task">
+          <label class="task-label">
+            <input type="checkbox" data-id="ruin-peace" disabled />
+            <span><strong>How To Ruin Peace</strong></span>
+          </label>
+          <div class="children">
+            <ul class="task-list">
+              <li class="task"><label class="task-label"><input type="checkbox" data-id="ruin-peace-edited" data-parent="ruin-peace" /> Edited in</label></li>
             </ul>
           </div>
         </li>
@@ -346,17 +330,102 @@
     <details open data-key="section-derts">
       <summary>
         <span>DERTS PvP Ranks</span>
-        <span class="section-meta">1 task</span>
+        <span class="section-meta">6 tasks</span>
       </summary>
       <ul class="task-list">
         <li class="task">
           <label class="task-label">
             <input type="checkbox" data-id="derts-website" disabled />
             <span><strong>DERTS Website</strong></span>
+            <span style="opacity:0.85; font-size:0.95rem;">(29/05/26)</span>
           </label>
           <div class="children">
-            <ul class="task-list">
-            </ul>
+            <details open data-key="section-homepage">
+              <summary>
+                <span>Home page 🏠</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task">
+                  <label class="task-label">
+                    <input type="checkbox" data-id="homepage-functionality" disabled />
+                    <span><strong>Functionality</strong></span>
+                  </label>
+                  <div class="children">
+                    <ul class="task-list">
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="move-elements" data-parent="homepage-functionality" /> Able to move around elements customisably on page</label></li>
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="website-features" data-parent="homepage-functionality" /> Every website feature present on page</label></li>
+                    </ul>
+                  </div>
+                </li>
+                <li class="task">
+                  <label class="task-label">
+                    <input type="checkbox" data-id="homepage-appearance" disabled />
+                    <span><strong>Appearance</strong></span>
+                  </label>
+                  <div class="children">
+                    <ul class="task-list">
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="background-tiles" data-parent="homepage-appearance" /> Background images on tiles</label></li>
+                      <li class="task"><label class="task-label"><input type="checkbox" data-id="refreshed-style" data-parent="homepage-appearance" /> Refreshed Style</label></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </details>
+
+            <details open data-key="section-ranks">
+              <summary>
+                <span>PvP Ranks page ⚔️</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-discord" data-parent="derts-website" /> Discord Button</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-3d" data-parent="derts-website" /> interactive 3d skins on profile banner</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-uptime" data-parent="derts-website" /> Constant uptime based on last snapshot</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="ranks-layout" data-parent="derts-website" /> Better layout</label></li>
+              </ul>
+            </details>
+
+            <details open data-key="section-events">
+              <summary>
+                <span>Events page 📯</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-expand" data-parent="derts-website" /> Expand/collapse events</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-live" data-parent="derts-website" /> Able to upload/detect live events</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-buttons" data-parent="derts-website" /> Better event tile buttons</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="events-title" data-parent="derts-website" /> Title fix</label></li>
+              </ul>
+            </details>
+
+            <details open data-key="section-videos-page">
+              <summary>
+                <span>Videos page 🎥</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-duplicate" data-parent="derts-website" /> Duplicate video bug fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-quota" data-parent="derts-website" /> Youtube api quota limit fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-title" data-parent="derts-website" /> Title fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="videos-banner" data-parent="derts-website" /> Yt banner height fix</label></li>
+              </ul>
+            </details>
+
+            <details open data-key="section-community">
+              <summary>
+                <span>Community page 🫂</span>
+                <span class="section-meta">4 tasks</span>
+              </summary>
+              <ul class="task-list">
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-clips" data-parent="derts-website" /> Uploadable clips feature</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-discord" data-parent="derts-website" /> Discord Tiles</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-title" data-parent="derts-website" /> Title Fix</label></li>
+                <li class="task"><label class="task-label"><input type="checkbox" data-id="community-announcement" data-parent="derts-website" /> Correct announcement discord text formatting</label></li>
+              </ul>
+            </details>
+
+            <li class="task"><label class="task-label"><input type="checkbox" data-id="first-event" data-parent="derts-website" /> <strong>First Event</strong> <span style="opacity:0.8; font-size:0.95rem;">(5/06/26)</span></label></li>
           </div>
         </li>
       </ul>
@@ -490,6 +559,10 @@
       checkboxes.forEach(box => {
         box.disabled = !enabled;
       });
+      detailsNodes.forEach(detail => {
+        detail.style.pointerEvents = enabled ? 'auto' : 'auto';
+      });
+      document.getElementById('clear-progress').disabled = !enabled;
       document.getElementById('edit-status').textContent = enabled ? '✏️ Edit Mode ON' : '🔒 View Only Mode';
       document.getElementById('edit-status').style.color = enabled ? '#22c55e' : '#94a3b8';
     }
@@ -522,6 +595,13 @@
         if (isEditMode) {
           saveState();
         }
+      });
+    });
+
+    document.getElementById('clear-progress').addEventListener('click', () => {
+      if (!confirm('Clear all progress?')) return;
+      db.ref(dbPath).set(null).then(() => {
+        window.location.reload();
       });
     });
 
