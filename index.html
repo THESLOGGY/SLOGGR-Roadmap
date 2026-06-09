@@ -25,9 +25,7 @@
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
-      background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 28%),
-                  radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.14), transparent 30%),
-                  linear-gradient(160deg, #071523 0%, #0e203f 35%, #09253f 60%, #081d2d 100%);
+      background: linear-gradient(135deg, #071523 0%, #0e203f 25%, #09253f 50%, #0a2d3d 100%);
     }
 
     body::before {
@@ -35,10 +33,10 @@
       position: fixed;
       inset: 0;
       z-index: -1;
-      background: radial-gradient(circle at 20% 18%, rgba(59, 130, 246, 0.28), transparent 28%),
-                  radial-gradient(circle at 78% 78%, rgba(34, 197, 94, 0.24), transparent 30%);
-      opacity: 0.85;
-      filter: blur(18px);
+      background: radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.32), transparent 35%),
+                  radial-gradient(circle at 85% 85%, rgba(34, 197, 94, 0.36), transparent 40%);
+      opacity: 0.9;
+      filter: blur(20px);
       animation: bgPulse 8s ease-in-out infinite alternate;
     }
 
@@ -216,15 +214,50 @@
       accent-color: #7dd3fc;
       cursor: pointer;
       flex-shrink: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      border: 2px solid #7dd3fc;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.6);
+      position: relative;
+    }
+
+    input[type='checkbox']:checked {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    input[type='checkbox']:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    input[type='checkbox']:indeterminate {
+      background: #eab308;
+      border-color: #eab308;
+    }
+
+    input[type='checkbox']:indeterminate::after {
+      content: '–';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     input[type='checkbox']:disabled {
       cursor: not-allowed;
       opacity: 0.5;
-    }
-
-    input[type='checkbox']:indeterminate {
-      accent-color: #eab308;
     }
 
     .children {
@@ -372,7 +405,6 @@
                       </summary>
                       <div class="children">
                         <ul class="task-list">
-                          <li class="task"><label class="task-label"><input type="checkbox" data-id="how-greed-kills-edited" data-parent="how-greed-kills" /> Edited in</label></li>
                         </ul>
                       </div>
                     </details>
@@ -387,7 +419,6 @@
                       </summary>
                       <div class="children">
                         <ul class="task-list">
-                          <li class="task"><label class="task-label"><input type="checkbox" data-id="the-mask-edited" data-parent="the-mask" /> Edited in</label></li>
                         </ul>
                       </div>
                     </details>
@@ -402,7 +433,6 @@
                       </summary>
                       <div class="children">
                         <ul class="task-list">
-                          <li class="task"><label class="task-label"><input type="checkbox" data-id="fortunae-edited" data-parent="fortunae-teaser" /> Edited in</label></li>
                         </ul>
                       </div>
                     </details>
@@ -417,7 +447,6 @@
                       </summary>
                       <div class="children">
                         <ul class="task-list">
-                          <li class="task"><label class="task-label"><input type="checkbox" data-id="ruin-peace-edited" data-parent="ruin-peace" /> Edited in</label></li>
                         </ul>
                       </div>
                     </details>
