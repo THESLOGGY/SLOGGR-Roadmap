@@ -204,7 +204,7 @@
         <div class="note">Shared roadmap synced in real-time with Firebase</div>
         <div id="auth-status" style="margin-top: 8px; font-weight: 600;">🔒 View Only Mode</div>
       </div>
-      <button class="button" id="auth-button">Editor sign-in</button>
+      <button class="button" id="auth-button">Sign in with Google to edit</button>
     </div>
 
     <div class="progress" aria-label="Overall progress">
@@ -356,7 +356,8 @@
             <span><strong>DERTS Website</strong></span>
           </label>
           <div class="children">
-            <ul class="task-list"></ul>
+            <ul class="task-list">
+            </ul>
           </div>
         </li>
       </ul>
@@ -375,7 +376,7 @@
       measurementId: "G-LXKQPSHXNF"
     };
 
-    const allowedEditorEmail = 'YOUR_EMAIL@gmail.com';
+    const allowedEditorEmail = 'jarmander105@gmail.com';
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -499,29 +500,40 @@
 
     function updateAuthUI(user) {
       if (!user) {
-        authButton.style.display = 'inline-flex';
-        authButton.textContent = 'Editor sign-in';
-        authStatus.textContent = '🔒 View Only Mode';
-        authStatus.style.color = '#94a3b8';
+        authButton.textContent = 'Sign in with Google to edit';
         return;
       }
-
-      authButton.style.display = 'none';
       if (user.email === allowedEditorEmail) {
+        authButton.textContent = 'Sign out';
         authStatus.textContent = `✏️ Signed in as ${user.email}`;
         authStatus.style.color = '#22c55e';
       } else {
+        authButton.textContent = 'Sign out';
         authStatus.textContent = `👁️ View only: ${user.email}`;
         authStatus.style.color = '#facc15';
       }
     }
 
+    function setViewOnlyMode() {
+      setEditMode(false);
+      authStatus.textContent = '🔒 View Only Mode';
+      authStatus.style.color = '#94a3b8';
+    }
+
     authButton.addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(err => {
-        console.error('Sign-in error:', err);
-        alert('Sign-in failed. Check console.');
-      });
+      const user = auth.currentUser;
+      if (!user) {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err => {
+          console.error('Sign-in error:', err);
+          alert('Sign-in failed. Check console.');
+        });
+      } else {
+        auth.signOut().catch(err => {
+          console.error('Sign-out error:', err);
+          alert('Sign-out failed. Check console.');
+        });
+      }
     });
 
     checkboxes.forEach(box => {
@@ -549,11 +561,11 @@
     auth.onAuthStateChanged(user => {
       updateAuthUI(user);
       if (!user) {
-        setEditMode(false);
+        setViewOnlyMode();
       } else if (user.email === allowedEditorEmail) {
         setEditMode(true);
       } else {
-        setEditMode(false);
+        setViewOnlyMode();
       }
     });
 
@@ -562,16 +574,16 @@
       loadState(data);
       if (!isInitialized) {
         isInitialized = true;
+        setViewOnlyMode();
       }
     }, err => {
       console.error('Firebase error:', err);
       alert('Error connecting to Firebase. View data may be unavailable.');
       if (!isInitialized) {
         isInitialized = true;
+        setViewOnlyMode();
       }
     });
-
-    setEditMode(false);
   </script>
 </body>
 </html>
