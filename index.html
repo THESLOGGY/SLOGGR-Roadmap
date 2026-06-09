@@ -23,9 +23,11 @@
       margin: 0;
       padding: 24px;
       min-height: 100vh;
-      background: #0f1720;
       position: relative;
       overflow-x: hidden;
+      background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.16), transparent 28%),
+                  radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.14), transparent 30%),
+                  linear-gradient(160deg, #071523 0%, #0e203f 35%, #09253f 60%, #081d2d 100%);
     }
 
     body::before {
@@ -33,21 +35,16 @@
       position: fixed;
       inset: 0;
       z-index: -1;
-      background: radial-gradient(circle at var(--x1, 12%) var(--y1, 15%), rgba(94, 114, 228, var(--o1, 0.38)), transparent 25%),
-                  radial-gradient(circle at var(--x2, 88%) var(--y2, 78%), rgba(16, 185, 129, var(--o2, 0.28)), transparent 28%);
-      animation: bgMove 18s ease-in-out infinite, bgPulse 8s ease-in-out infinite;
-    }
-
-    @keyframes bgMove {
-      0%, 100% { --x1: 10%; --y1: 16%; --x2: 86%; --y2: 78%; }
-      25% { --x1: 18%; --y1: 22%; --x2: 92%; --y2: 70%; }
-      50% { --x1: 24%; --y1: 12%; --x2: 82%; --y2: 86%; }
-      75% { --x1: 14%; --y1: 28%; --x2: 88%; --y2: 72%; }
+      background: radial-gradient(circle at 20% 18%, rgba(59, 130, 246, 0.28), transparent 28%),
+                  radial-gradient(circle at 78% 78%, rgba(34, 197, 94, 0.24), transparent 30%);
+      opacity: 0.85;
+      filter: blur(18px);
+      animation: bgPulse 8s ease-in-out infinite alternate;
     }
 
     @keyframes bgPulse {
-      0%, 100% { --o1: 0.36; --o2: 0.22; }
-      50% { --o1: 0.52; --o2: 0.38; }
+      0% { opacity: 0.75; }
+      100% { opacity: 0.95; }
     }
 
     .page {
