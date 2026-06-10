@@ -516,21 +516,6 @@
         detail.classList.remove('no-children');
       }
     });
-    // Ensure summaries toggle details reliably, except for top-level columns
-    detailsNodes.forEach(detail => {
-      const summary = detail.querySelector('summary');
-      if (!summary) return;
-      // skip top-level columns and genuinely empty details
-      if (detail.classList.contains('top-level') || detail.classList.contains('no-children')) return;
-
-      summary.addEventListener('click', (e) => {
-        // if user clicked on a checkbox/input inside summary, don't toggle the details here
-        if (e.target && (e.target.tagName === 'INPUT' || (e.target.closest && e.target.closest('input')))) return;
-        detail.open = !detail.open;
-        updateMiniProgress();
-        if (isEditMode) saveState();
-      });
-    });
     const progressText = document.getElementById('progress-text');
     const authStatus = document.getElementById('auth-status');
 
