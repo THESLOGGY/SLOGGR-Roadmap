@@ -75,15 +75,17 @@
     summary::before {
       content: '▾';
       display: inline-block;
-      transform: rotate(0deg);
-      transition: transform 0.2s ease;
+      transform: rotate(-90deg);
+      transform-origin: center;
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
       width: 1em;
       text-align: center;
       color: #7dd3fc;
+      will-change: transform;
     }
 
-    details[open] summary::before {
-      transform: rotate(180deg);
+    details[open] > summary::before {
+      transform: rotate(0deg);
     }
 
     .section-meta {
@@ -133,7 +135,9 @@
       background: rgba(125, 211, 252, 0.12);
       color: #7dd3fc;
       cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
+      transform-origin: center;
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
+      will-change: transform;
     }
 
     li.task.has-toggle {
