@@ -191,6 +191,34 @@
       text-align: right;
     }
 
+    .auth-bar {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .auth-button {
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: rgba(15, 23, 42, 0.72);
+      color: #e6f7ff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-button:hover {
+      border-color: rgba(125, 211, 252, 0.6);
+      background: rgba(30, 41, 59, 0.88);
+    }
+
+    .auth-button[hidden] {
+      display: none;
+    }
+
     label.task-label {
       display: flex;
       align-items: center;
@@ -198,12 +226,15 @@
       font-weight: 600;
       cursor: pointer;
       line-height: 1.2;
-      pointer-events: none;
       width: 100%;
     }
 
+    summary > label.task-label {
+      cursor: default;
+    }
+
     summary > label.task-label input {
-      pointer-events: auto;
+      cursor: not-allowed;
     }
 
     details details > summary {
@@ -307,6 +338,11 @@
       <div class="progress-bar" id="overall-progress"></div>
     </div>
     <div class="section-meta" id="progress-text">0 of 0 tasks complete</div>
+    <div class="auth-bar">
+      <span class="section-meta" id="auth-status">Checking sign-in...</span>
+      <button class="auth-button" id="sign-in-button" type="button">Sign in with Google</button>
+      <button class="auth-button" id="sign-out-button" type="button" hidden>Sign out</button>
+    </div>
 
     <div class="main-grid">
       <details open class="top-level" data-key="section-boundless">
@@ -516,6 +552,8 @@
     });
     const progressText = document.getElementById('progress-text');
     const authStatus = document.getElementById('auth-status');
+    const signInButton = document.getElementById('sign-in-button');
+    const signOutButton = document.getElementById('sign-out-button');
 
     let isEditMode = false;
     let isInitialized = false;
@@ -696,17 +734,36 @@
       if (!user) {
         authStatus.textContent = '🔒 View Only Mode';
         authStatus.style.color = '#94a3b8';
+        signInButton.hidden = false;
+        signOutButton.hidden = true;
         return;
       }
 
-      if (user.email === allowedEditorEmail) {
+      if (user.email && user.email.toLowerCase() === allowedEditorEmail.toLowerCase()) {
         authStatus.textContent = `✏️ Signed in as ${user.email}`;
         authStatus.style.color = '#22c55e';
       } else {
         authStatus.textContent = `👁️ View only: ${user.email}`;
         authStatus.style.color = '#facc15';
       }
+      signInButton.hidden = true;
+      signOutButton.hidden = false;
     }
+
+    signInButton.addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err => {
+        console.error('Google sign-in failed:', err);
+        alert('Google sign-in failed. Check the console for details.');
+      });
+    });
+
+    signOutButton.addEventListener('click', () => {
+      auth.signOut().catch(err => {
+        console.error('Sign-out failed:', err);
+        alert('Sign-out failed. Check the console for details.');
+      });
+    });
 
     checkboxes.forEach(box => {
       box.addEventListener('change', () => {
@@ -732,7 +789,8 @@
     });
 
     auth.onAuthStateChanged(user => {
-      if (user && user.email === allowedEditorEmail) {
+      updateAuthUI(user);
+      if (user && user.email && user.email.toLowerCase() === allowedEditorEmail.toLowerCase()) {
         setEditMode(true);
         updateProgress();
       } else {
