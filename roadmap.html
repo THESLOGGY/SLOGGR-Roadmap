@@ -119,6 +119,48 @@
       cursor: pointer;
     }
 
+    .task-toggle {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: rgba(125, 211, 252, 0.12);
+      color: #7dd3fc;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    li.task.has-toggle {
+      grid-template-columns: auto 1fr;
+    }
+
+    li.task.has-toggle > .task-label {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    li.task.has-toggle > .children {
+      grid-column: 2;
+    }
+
+    .task-toggle:hover {
+      background: rgba(125, 211, 252, 0.22);
+    }
+
+    li.task.collapsed > .task-toggle {
+      transform: rotate(-90deg);
+    }
+
+    li.task.collapsed > .children {
+      display: none;
+    }
+
     input[type='checkbox'] {
       width: 18px;
       height: 18px;
@@ -473,6 +515,27 @@
     }
 
     const parentMap = buildParentMap();
+
+    document.querySelectorAll('li.task > .children').forEach(children => {
+      const task = children.parentElement;
+      const label = task.querySelector(':scope > .task-label');
+      if (!label || task.querySelector(':scope > .task-toggle')) return;
+
+      task.classList.add('has-toggle');
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'task-toggle';
+      toggle.setAttribute('aria-label', `Collapse ${label.textContent.trim()}`);
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.textContent = '▾';
+      task.insertBefore(toggle, label);
+
+      toggle.addEventListener('click', () => {
+        const collapsed = task.classList.toggle('collapsed');
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        toggle.setAttribute('aria-label', `${collapsed ? 'Expand' : 'Collapse'} ${label.textContent.trim()}`);
+      });
+    });
 
     function updateParent(id) {
       const parentBox = document.querySelector(`input[data-id="${id}"]`);

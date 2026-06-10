@@ -255,28 +255,18 @@
       pointer-events: none;
     }
 
-    details.top-level summary::before {
+    details.top-level > summary::before {
       content: '';
       width: 0;
       opacity: 0;
     }
 
-    details.top-level summary {
-      cursor: default;
-      pointer-events: none;
-    }
-    details.top-level summary::before {
-      content: '';
-      width: 0;
-      opacity: 0;
-    }
-
-    details.top-level summary {
+    details.top-level > summary {
       cursor: default;
       pointer-events: none;
     }
 
-    details.top-level summary span:first-child {
+    details.top-level > summary span:first-child {
       font-size: 1.15rem;
       font-weight: 700;
     }
